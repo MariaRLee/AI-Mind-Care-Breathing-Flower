@@ -1,0 +1,848 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#f8f4ff" />
+  <meta name="description" content="AI-Mind Care 呼吸花開｜Breathing Flower：居家正念呼吸練習與呼吸花園。" />
+  <title>AI-Mind Care 呼吸花開｜Breathing Flower V1.2.1</title>
+  <script src="config.js"></script>
+  <style>
+    :root{
+      --ink:#302946;
+      --muted:#746b87;
+      --panel:rgba(255,255,255,.86);
+      --line:rgba(82,65,111,.14);
+      --purple:#8d72d4;
+      --pink:#e887b3;
+      --green:#5fa68a;
+      --cream:#fff9f4;
+      --shadow:0 18px 48px rgba(67,51,96,.15);
+      --radius:24px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;min-height:100vh;color:var(--ink);
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+      background:
+        radial-gradient(circle at 8% 8%,rgba(255,210,228,.75),transparent 28%),
+        radial-gradient(circle at 90% 10%,rgba(207,221,255,.75),transparent 30%),
+        radial-gradient(circle at 50% 100%,rgba(207,244,224,.82),transparent 34%),
+        linear-gradient(145deg,#fffafd,#f5f2ff 52%,#f5fff9);
+      padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+    }
+    button,input,select{font:inherit}
+    button,a{touch-action:manipulation}
+    .app{
+      width:min(1120px,100%);min-height:100dvh;margin:auto;padding:12px 16px 8px;
+      display:flex;flex-direction:column;gap:10px
+    }
+    header{
+      min-height:56px;display:flex;align-items:center;justify-content:space-between;gap:12px;
+    }
+    .brand{display:flex;align-items:center;gap:11px;min-width:0}
+    .brand-mark{
+      width:46px;height:46px;border-radius:15px;display:grid;place-items:center;font-size:25px;
+      background:linear-gradient(135deg,#ec9cbd,#8b75d7);box-shadow:0 9px 22px rgba(120,91,168,.23)
+    }
+    h1{font-size:clamp(1.2rem,2.6vw,1.85rem);line-height:1.15;margin:0}
+    .version{
+      display:inline-block;margin-left:7px;padding:3px 8px;border-radius:999px;
+      background:#efe9fb;color:#6b56a5;font-size:.65rem;vertical-align:middle
+    }
+    .subtitle{margin:4px 0 0;color:var(--muted);font-size:.86rem}
+    .top-actions{display:flex;gap:7px;justify-content:flex-end;flex-wrap:wrap}
+    .btn{
+      min-height:40px;border:0;border-radius:13px;padding:9px 13px;cursor:pointer;
+      display:inline-flex;align-items:center;justify-content:center;gap:6px;
+      color:var(--ink);background:#fff;text-decoration:none;font-weight:800;
+      box-shadow:0 6px 16px rgba(63,50,88,.1);
+      transition:transform .16s ease,box-shadow .16s ease,opacity .16s ease
+    }
+    .btn:hover{transform:translateY(-1px);box-shadow:0 9px 20px rgba(63,50,88,.14)}
+    .btn:active{transform:translateY(1px)}
+    .btn.primary{color:#fff;background:linear-gradient(135deg,#9271d7,#e482af)}
+    .btn.soft{background:#f0ebfa}
+    .btn.green{color:#fff;background:linear-gradient(135deg,#54a284,#83bf91)}
+    .btn.warm{color:#8c4a3b;background:#fff0ea}
+    .btn:disabled{opacity:.48;cursor:not-allowed;transform:none}
+    main{flex:1;min-height:0;display:flex}
+    .practice-card{
+      width:100%;min-height:0;background:var(--panel);
+      border:1px solid rgba(255,255,255,.76);border-radius:var(--radius);
+      box-shadow:var(--shadow);backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px);
+      padding:14px 18px;display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:10px
+    }
+    .setup-strip{
+      display:grid;grid-template-columns:1.25fr 1.2fr 1.45fr 1.25fr;gap:9px;align-items:end
+    }
+    .field label{display:block;font-size:.78rem;font-weight:850;color:#5f5571;margin:0 0 5px}
+    .text-input,.select,.info-box{
+      width:100%;height:42px;border:1px solid var(--line);border-radius:12px;
+      background:#fff;color:var(--ink);padding:8px 11px
+    }
+    .text-input::placeholder{color:#a399af}
+    .info-box{display:flex;align-items:center;font-weight:800;font-variant-numeric:tabular-nums;font-size:.87rem}
+    .segmented{height:42px;display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+    .segmented input{position:absolute;opacity:0;pointer-events:none}
+    .segmented label{
+      margin:0;display:grid;place-items:center;border-radius:11px;border:1px solid var(--line);
+      background:#fff;cursor:pointer;font-weight:850;color:#625875
+    }
+    .segmented input:checked+label{
+      border-color:transparent;color:#fff;background:linear-gradient(135deg,#9876d7,#e887b3)
+    }
+    .practice-zone{
+      min-height:0;display:grid;grid-template-columns:minmax(170px,.78fr) minmax(300px,420px) minmax(170px,.78fr);
+      gap:14px;align-items:center
+    }
+    .side-panel{
+      min-height:245px;border:1px solid var(--line);border-radius:20px;padding:15px;
+      background:rgba(255,255,255,.72);display:flex;flex-direction:column;justify-content:center
+    }
+    .phase-label{font-size:.76rem;color:var(--muted);font-weight:850;text-transform:uppercase;letter-spacing:.06em}
+    .phase{
+      font-size:clamp(1.45rem,3.2vw,2.25rem);font-weight:950;margin:4px 0 2px
+    }
+    .instruction{color:var(--muted);font-size:.91rem;line-height:1.5;min-height:42px}
+    .timer{font-size:clamp(2rem,5vw,3.4rem);font-weight:950;font-variant-numeric:tabular-nums;letter-spacing:.03em;margin:10px 0}
+    .progress{
+      height:10px;background:#ede8f4;border-radius:999px;overflow:hidden
+    }
+    .progress>div{
+      height:100%;width:0;border-radius:inherit;
+      background:linear-gradient(90deg,#8e73d5,#ec8fb7,#75bd92);transition:width .25s linear
+    }
+    .flower-stage{
+      min-height:295px;position:relative;display:grid;place-items:center;overflow:hidden
+    }
+    .halo{
+      position:absolute;width:290px;aspect-ratio:1;border-radius:50%;
+      background:radial-gradient(circle,rgba(255,255,255,.95),rgba(218,201,250,.4) 50%,transparent 72%);
+      transform:scale(.7);opacity:.72;transition:transform 1s ease,opacity 1s ease
+    }
+    .flower{
+      position:relative;width:250px;aspect-ratio:1;transform:scale(.67) rotate(-4deg);
+      transition:transform 1s cubic-bezier(.2,.8,.2,1);
+      filter:drop-shadow(0 16px 18px rgba(87,66,117,.18))
+    }
+    .flower .petal{
+      position:absolute;left:50%;top:50%;width:32%;height:48%;
+      border-radius:62% 62% 48% 48%;transform-origin:50% 100%;
+      background:linear-gradient(180deg,#ffdce9,#ea92ba 58%,#b875ca);
+      border:1px solid rgba(255,255,255,.68)
+    }
+    .flower .petal:nth-child(1){transform:translate(-50%,-100%) rotate(0)}
+    .flower .petal:nth-child(2){transform:translate(-50%,-100%) rotate(45deg)}
+    .flower .petal:nth-child(3){transform:translate(-50%,-100%) rotate(90deg)}
+    .flower .petal:nth-child(4){transform:translate(-50%,-100%) rotate(135deg)}
+    .flower .petal:nth-child(5){transform:translate(-50%,-100%) rotate(180deg)}
+    .flower .petal:nth-child(6){transform:translate(-50%,-100%) rotate(225deg)}
+    .flower .petal:nth-child(7){transform:translate(-50%,-100%) rotate(270deg)}
+    .flower .petal:nth-child(8){transform:translate(-50%,-100%) rotate(315deg)}
+    .flower .petal.inner{width:24%;height:37%;background:linear-gradient(180deg,#fff4c9,#f2ba73 64%,#db869e)}
+    .flower .petal.i1{transform:translate(-50%,-100%) rotate(22.5deg)}
+    .flower .petal.i2{transform:translate(-50%,-100%) rotate(67.5deg)}
+    .flower .petal.i3{transform:translate(-50%,-100%) rotate(112.5deg)}
+    .flower .petal.i4{transform:translate(-50%,-100%) rotate(157.5deg)}
+    .flower .petal.i5{transform:translate(-50%,-100%) rotate(202.5deg)}
+    .flower .petal.i6{transform:translate(-50%,-100%) rotate(247.5deg)}
+    .flower .petal.i7{transform:translate(-50%,-100%) rotate(292.5deg)}
+    .flower .petal.i8{transform:translate(-50%,-100%) rotate(337.5deg)}
+    .center{
+      position:absolute;left:50%;top:50%;width:26%;height:26%;transform:translate(-50%,-50%);
+      border-radius:50%;background:radial-gradient(circle at 38% 34%,#fffbd8,#f5ca6d 50%,#d49a4e);
+      border:4px solid rgba(255,255,255,.76)
+    }
+    .flower.inhale{transform:scale(1) rotate(3deg)}
+    .flower.exhale{transform:scale(.67) rotate(-4deg)}
+    .halo.inhale{transform:scale(1.05);opacity:1}
+    .halo.exhale{transform:scale(.7);opacity:.68}
+    .flower.paused,.halo.paused{transition:none}
+    .growth-title{font-weight:900;margin-bottom:10px}
+    .growth-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+    .growth-step{
+      min-height:62px;border:1px solid var(--line);border-radius:14px;background:#fff;
+      display:grid;place-items:center;text-align:center;padding:6px;color:#958ca2;opacity:.65
+    }
+    .growth-step .icon{font-size:1.45rem}
+    .growth-step small{font-size:.69rem;font-weight:850}
+    .growth-step.active{opacity:1;color:#564a6a;border-color:#d9c9f1;background:#faf7ff;box-shadow:0 6px 14px rgba(94,74,126,.09)}
+    .today-card{
+      margin-top:11px;padding:11px;border-radius:14px;background:linear-gradient(135deg,#fff4f8,#f3efff);
+      display:flex;justify-content:space-between;gap:10px;align-items:center
+    }
+    .today-card strong{font-size:1.35rem}
+    .today-card span{display:block;color:var(--muted);font-size:.74rem;font-weight:800}
+    .controls{
+      display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;
+      padding-top:2px
+    }
+    .controls .btn{min-width:118px}
+    .safety{margin:0;text-align:center;color:var(--muted);font-size:.78rem}
+    footer{text-align:center;color:var(--muted);font-size:.76rem;min-height:24px}
+    footer button{border:0;background:none;color:#62528d;text-decoration:underline;cursor:pointer;padding:0}
+    dialog{
+      width:min(760px,calc(100% - 22px));max-height:90dvh;border:0;border-radius:22px;padding:0;
+      color:var(--ink);box-shadow:0 28px 86px rgba(46,32,68,.34)
+    }
+    dialog::backdrop{background:rgba(41,33,54,.45);backdrop-filter:blur(4px)}
+    .modal{background:#fff;padding:20px;overflow:auto;max-height:90dvh}
+    .modal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:13px}
+    .modal h2{margin:0;font-size:1.35rem}
+    .modal-sub{color:var(--muted);font-size:.87rem;margin:4px 0 0}
+    .icon-close{width:38px;height:38px;padding:0;border-radius:12px}
+    .modal-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:15px}
+    .guide-list{padding-left:22px;line-height:1.65}
+    .note{
+      padding:12px 13px;border-radius:14px;background:#f7f3ff;border:1px solid #e5dbf7;
+      color:#5f5474;font-size:.86rem;line-height:1.55
+    }
+    .garden-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    .stat{
+      background:linear-gradient(145deg,#fff,#f8f5ff);border:1px solid var(--line);border-radius:15px;
+      padding:12px;text-align:center
+    }
+    .stat strong{display:block;font-size:1.45rem}
+    .stat span{font-size:.75rem;color:var(--muted);font-weight:800}
+    .section-title{font-weight:950;margin:17px 0 9px}
+    .week-garden{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+    .day-pot{
+      min-height:86px;border-radius:14px;border:1px solid var(--line);background:#fbfaff;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:5px;text-align:center
+    }
+    .day-pot .day{font-size:.68rem;color:var(--muted);font-weight:850}
+    .day-pot .bloom{font-size:1.65rem;line-height:1.1}
+    .day-pot .count{font-size:.66rem;color:#716683;font-weight:850}
+    .badges{display:flex;gap:7px;flex-wrap:wrap}
+    .badge{
+      border:1px solid var(--line);border-radius:999px;padding:7px 10px;background:#fff;
+      font-size:.8rem;font-weight:850;color:#92899d;opacity:.65
+    }
+    .badge.earned{opacity:1;color:#5a4f6f;background:#fff8e8;border-color:#efdca4}
+    .record-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;max-height:270px;overflow:auto;padding-right:2px}
+    .record-card{
+      border:1px solid var(--line);border-radius:15px;background:#fff;padding:11px;
+      display:grid;grid-template-columns:42px 1fr;gap:9px;align-items:center
+    }
+    .record-flower{font-size:2rem;text-align:center}
+    .record-card strong{display:block;font-size:.91rem}
+    .record-card small{display:block;color:var(--muted);line-height:1.45;margin-top:2px}
+    .empty{text-align:center;color:var(--muted);padding:23px;background:#faf8fd;border-radius:15px}
+    .online-box{display:none;margin-top:14px}
+    .online-box.visible{display:block}
+    .check-row{display:flex;gap:9px;align-items:flex-start;font-weight:850;cursor:pointer}
+    .check-row input{width:20px;height:20px;accent-color:var(--purple);flex:0 0 auto}
+    .reward{
+      text-align:center;padding:22px 20px 18px;position:relative;overflow:hidden;
+      background:
+        radial-gradient(circle at 50% 20%,rgba(255,229,239,.9),transparent 36%),
+        linear-gradient(145deg,#fff,#f4fff8)
+    }
+    .reward-emoji{font-size:5rem;filter:drop-shadow(0 12px 16px rgba(94,73,112,.18))}
+    .reward h2{font-size:1.65rem;margin:6px 0 3px}
+    .reward-name{font-size:1.1rem;font-weight:950;color:#735b9d}
+    .reward-quote{color:var(--muted);line-height:1.6;margin:10px auto;max-width:520px}
+    .reward-meta{font-size:.88rem;color:#5e536f;background:#fff;border:1px solid var(--line);display:inline-block;padding:8px 12px;border-radius:999px}
+    .petal-burst{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+    .petal-burst span{
+      position:absolute;top:-30px;font-size:1.2rem;animation:fall 2.8s linear forwards
+    }
+    @keyframes fall{
+      to{transform:translate(var(--drift),110vh) rotate(520deg);opacity:.1}
+    }
+    @media (max-height:720px) and (min-width:801px){
+      .app{padding-top:7px;gap:6px}
+      header{min-height:50px}
+      .brand-mark{width:41px;height:41px}
+      .practice-card{padding:10px 15px;gap:6px}
+      .setup-strip{gap:7px}
+      .text-input,.select,.info-box,.segmented{height:38px}
+      .flower-stage{min-height:250px}
+      .flower{width:218px}
+      .halo{width:254px}
+      .side-panel{min-height:215px;padding:12px}
+      .timer{margin:5px 0;font-size:2.6rem}
+      .growth-step{min-height:53px}
+      .controls .btn{min-height:37px;padding:7px 11px}
+      footer{font-size:.7rem}
+    }
+    @media (max-width:800px){
+      .app{padding:9px}
+      header{align-items:flex-start}
+      .top-actions{max-width:55%}
+      .btn{padding:8px 10px}
+      .practice-card{display:flex;flex-direction:column;padding:12px}
+      .setup-strip{grid-template-columns:1fr 1fr}
+      .practice-zone{grid-template-columns:1fr;gap:6px}
+      .side-panel{min-height:auto;padding:11px}
+      .status-panel{order:1;display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}
+      .status-panel .instruction{grid-column:1/-1;min-height:auto}
+      .status-panel .timer{margin:0;font-size:2rem}
+      .status-panel .progress{grid-column:1/-1}
+      .flower-stage{order:2;min-height:270px}
+      .growth-panel{order:3;min-height:auto}
+      .growth-panel .growth-title{display:none}
+      .growth-steps{grid-template-columns:repeat(4,1fr)}
+      .today-card{margin-top:8px}
+      .controls .btn{min-width:calc(50% - 8px)}
+      .record-list{grid-template-columns:1fr}
+    }
+    @media (max-width:500px){
+      .brand-mark{width:40px;height:40px;border-radius:13px}
+      h1{font-size:1.06rem}
+      .subtitle{font-size:.72rem}
+      .top-actions{gap:5px}
+      .top-actions .btn{font-size:.78rem;min-height:36px}
+      .setup-strip{grid-template-columns:1fr}
+      .field label{font-size:.75rem}
+      .flower-stage{min-height:245px}
+      .flower{width:210px}
+      .halo{width:240px}
+      .controls{gap:6px}
+      .controls .btn{min-width:calc(50% - 6px);font-size:.88rem}
+      .garden-stats{grid-template-columns:repeat(3,1fr)}
+      .week-garden{grid-template-columns:repeat(7,minmax(42px,1fr));overflow-x:auto;padding-bottom:3px}
+      .modal{padding:15px}
+    }
+    @media (prefers-reduced-motion:reduce){
+      *,*::before,*::after{scroll-behavior:auto!important}
+      .flower,.halo,.progress>div{transition-duration:.2s!important}
+      .petal-burst span{animation-duration:.4s!important}
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">🌸</div>
+      <div>
+        <h1><span data-i18n="title">AI-Mind Care 呼吸花開</span><span class="version">V1.2.1</span></h1>
+        <p class="subtitle" data-i18n="subtitle">一呼一吸，讓今日花園慢慢盛開</p>
+      </div>
+    </div>
+    <div class="top-actions">
+      <a class="btn" id="homeBtn" href="https://www.hyloveclub.com"><span data-i18n="home">Home｜首頁</span></a>
+      <button class="btn" id="guideBtn"><span data-i18n="guide">使用指南</span></button>
+      <button class="btn soft" id="gardenBtn">🌿 <span data-i18n="myGarden">我的花園</span></button>
+      <button class="btn" id="langBtn" aria-label="Switch language">EN</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="practice-card" aria-labelledby="practiceTitle">
+      <div class="setup-strip">
+        <div class="field">
+          <label for="nickname" data-i18n="nickname">暱稱（選填）</label>
+          <input id="nickname" class="text-input" maxlength="30" autocomplete="nickname"
+                 placeholder="請勿輸入真實姓名" data-i18n-placeholder="nicknamePlaceholder">
+        </div>
+        <div class="field">
+          <label data-i18n="duration">練習時間</label>
+          <div class="segmented">
+            <input type="radio" name="duration" id="d1" value="60" checked><label for="d1">1 <span data-i18n="minute">分鐘</span></label>
+            <input type="radio" name="duration" id="d3" value="180"><label for="d3">3 <span data-i18n="minute">分鐘</span></label>
+            <input type="radio" name="duration" id="d5" value="300"><label for="d5">5 <span data-i18n="minute">分鐘</span></label>
+          </div>
+        </div>
+        <div class="field">
+          <label for="pace" data-i18n="pace">呼吸節奏</label>
+          <select id="pace" class="select">
+            <option value="4,6" data-i18n="paceGentle">舒緩：吸4秒／呼6秒</option>
+            <option value="4,4" data-i18n="paceEven">平衡：吸4秒／呼4秒</option>
+            <option value="3,5" data-i18n="paceEasy">輕柔：吸3秒／呼5秒</option>
+          </select>
+        </div>
+        <div class="field">
+          <label data-i18n="dateTime">日期與時間</label>
+          <div class="info-box" id="currentDateTime"></div>
+        </div>
+      </div>
+
+      <div class="practice-zone">
+        <section class="side-panel status-panel">
+          <div>
+            <div class="phase-label" data-i18n="currentBreath">目前呼吸</div>
+            <div class="phase" id="phaseText" data-i18n="ready">準備好時開始</div>
+            <div class="instruction" id="instruction" data-i18n="readyHint">以舒服、不勉強的方式自然呼吸</div>
+          </div>
+          <div class="timer" id="timer">01:00</div>
+          <div class="progress" aria-label="Session progress"><div id="progressBar"></div></div>
+        </section>
+
+        <div class="flower-stage" role="img" aria-label="Animated breathing flower">
+          <div class="halo exhale" id="halo"></div>
+          <div class="flower exhale" id="flower">
+            <span class="petal"></span><span class="petal"></span><span class="petal"></span><span class="petal"></span>
+            <span class="petal"></span><span class="petal"></span><span class="petal"></span><span class="petal"></span>
+            <span class="petal inner i1"></span><span class="petal inner i2"></span>
+            <span class="petal inner i3"></span><span class="petal inner i4"></span>
+            <span class="petal inner i5"></span><span class="petal inner i6"></span>
+            <span class="petal inner i7"></span><span class="petal inner i8"></span>
+            <span class="center"></span>
+          </div>
+        </div>
+
+        <section class="side-panel growth-panel">
+          <div class="growth-title" data-i18n="gardenGrowth">本次花園成長</div>
+          <div class="growth-steps">
+            <div class="growth-step active" data-stage="0"><span class="icon">🌱</span><small data-i18n="seed">種子</small></div>
+            <div class="growth-step" data-stage="1"><span class="icon">🌿</span><small data-i18n="sprout">發芽</small></div>
+            <div class="growth-step" data-stage="2"><span class="icon">🌷</span><small data-i18n="bud">花苞</small></div>
+            <div class="growth-step" data-stage="3"><span class="icon">🌸</span><small data-i18n="bloom">盛開</small></div>
+          </div>
+          <div class="today-card">
+            <div><strong id="todayCount">0</strong><span data-i18n="todayPractices">今日完成</span></div>
+            <div><strong id="gardenCount">0</strong><span data-i18n="gardenFlowers">花園花朵</span></div>
+          </div>
+        </section>
+      </div>
+
+      <div>
+        <div class="controls">
+          <button class="btn primary" id="startBtn">▶ <span data-i18n="start">開始練習</span></button>
+          <button class="btn soft" id="pauseBtn" disabled>⏸ <span data-i18n="pause">暫停</span></button>
+          <button class="btn warm" id="resetBtn">↻ <span data-i18n="restart">重新開始</span></button>
+          <button class="btn" id="soundBtn" aria-pressed="false">🔇 <span data-i18n="soundOff">提示音：關</span></button>
+        </div>
+        <p class="safety" data-i18n="safety">若感到頭暈或不舒服，請回到自然呼吸並停止練習。</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    © 2026 Hylove Business Inc / AI-Mind Care ・
+    <button id="termsBtn" data-i18n="terms">完整著作權與使用條款</button>
+  </footer>
+</div>
+
+<dialog id="guideDialog">
+  <div class="modal">
+    <div class="modal-head">
+      <div><h2 data-i18n="guideTitle">呼吸花開｜使用指南</h2><p class="modal-sub" data-i18n="guideSub">簡單、溫柔、不需要追求完美。</p></div>
+      <button class="btn icon-close closeDialog" aria-label="Close">✕</button>
+    </div>
+    <ol class="guide-list">
+      <li data-i18n="g1">輸入選填暱稱，選擇 1、3 或 5 分鐘。</li>
+      <li data-i18n="g2">花朵展開時吸氣，花朵收合時呼氣；不需要憋氣。</li>
+      <li data-i18n="g3">完成練習後，系統會自動保存日期、時間、練習時長與獲得的花朵。</li>
+      <li data-i18n="g4">每次完成都會得到一朵驚喜花，可在「我的花園」查看。</li>
+      <li data-i18n="g5">按下「提示音：關」可開啟並立即試聽柔和提示音。</li>
+    </ol>
+    <div class="note" data-i18n="guideSafety">本工具僅供正念練習與自我覺察使用，不作為個人能力評價。請以舒適自然的方式進行。</div>
+  </div>
+</dialog>
+
+<dialog id="gardenDialog">
+  <div class="modal">
+    <div class="modal-head">
+      <div><h2 data-i18n="gardenTitle">我的呼吸花園</h2><p class="modal-sub" data-i18n="gardenSub">每一次完成，都為花園增加一朵花。</p></div>
+      <button class="btn icon-close closeDialog" aria-label="Close">✕</button>
+    </div>
+
+    <div class="garden-stats">
+      <div class="stat"><strong id="modalToday">0</strong><span data-i18n="todayPractices">今日完成</span></div>
+      <div class="stat"><strong id="modalTotal">0</strong><span data-i18n="totalPractices">累計完成</span></div>
+      <div class="stat"><strong id="modalFlowers">0</strong><span data-i18n="gardenFlowers">花園花朵</span></div>
+    </div>
+
+    <div class="section-title" data-i18n="weeklyGarden">最近七天花園</div>
+    <div class="week-garden" id="weekGarden"></div>
+
+    <div class="section-title" data-i18n="gentleBadges">溫柔成就</div>
+    <div class="badges" id="badges"></div>
+
+    <div class="section-title" data-i18n="recentFlowers">最近獲得的花朵</div>
+    <div class="record-list" id="recordList"></div>
+
+    <div class="online-box note" id="onlineBox">
+      <label class="check-row">
+        <input type="checkbox" id="onlineBackup">
+        <span data-i18n="onlineBackup">允許線上進度備份（暱稱、完成日期時間、練習時長與花朵）</span>
+      </label>
+      <p data-i18n="onlinePrivacy">線上備份為自願選項。請勿使用真實姓名；系統不收集情緒、放鬆程度、呼吸循環或文字反思。</p>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn" id="exportBtn" data-i18n="export">匯出 CSV</button>
+      <button class="btn warm" id="clearBtn" data-i18n="clear">清除紀錄</button>
+      <button class="btn primary closeDialog" data-i18n="close">關閉</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="rewardDialog">
+  <div class="reward">
+    <div class="petal-burst" id="petalBurst"></div>
+    <div class="reward-emoji" id="rewardEmoji">🌸</div>
+    <h2 data-i18n="rewardTitle">今天的呼吸花已盛開</h2>
+    <div class="reward-name" id="rewardName"></div>
+    <p class="reward-quote" id="rewardQuote"></p>
+    <div class="reward-meta" id="rewardMeta"></div>
+    <div class="modal-actions" style="justify-content:center">
+      <button class="btn soft" id="viewGardenBtn">🌿 <span data-i18n="viewGarden">查看我的花園</span></button>
+      <button class="btn primary" id="practiceAgainBtn" data-i18n="practiceAgain">再練習一次</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="termsDialog">
+  <div class="modal">
+    <div class="modal-head">
+      <div><h2 data-i18n="termsTitle">著作權與使用條款</h2></div>
+      <button class="btn icon-close closeDialog" aria-label="Close">✕</button>
+    </div>
+    <p data-i18n="termsP1">本網站內容僅供文化教育、認知活動、正念練習與互動體驗使用。未經授權，不得作商業用途、重製、改作或散布。</p>
+    <p data-i18n="termsP2">一般分享、教學引用或非商業使用，請清楚標示來源：Hylove Business Inc / AI-Mind Care。</p>
+    <p data-i18n="termsP3">每筆完成紀錄只包含暱稱、完成日期與時間、練習時長及獲得的花朵。本機紀錄可由使用者自行匯出或清除；只有在使用者主動啟用線上進度備份時，指定欄位才會傳送至線上紀錄系統。</p>
+  </div>
+</dialog>
+
+<script>
+(() => {
+  "use strict";
+  const $ = s => document.querySelector(s);
+  const $$ = s => [...document.querySelectorAll(s)];
+  const CONFIG = window.AI_MIND_CARE_CONFIG || {};
+  const ONLINE_ENDPOINT = String(CONFIG.onlineEndpoint || "").trim();
+  const STORAGE_KEY = "amc_breath_records_v121";
+  const OLD_STORAGE_KEY = "amc_breath_records";
+  const NICKNAME_KEY = "amc_breath_nickname";
+  const SOUND_KEY = "amc_breath_sound_v121";
+  const BACKUP_KEY = "amc_breath_online_backup_v121";
+
+  const translations = {
+    zh:{
+      title:"AI-Mind Care 呼吸花開",subtitle:"一呼一吸，讓今日花園慢慢盛開",home:"Home｜首頁",guide:"使用指南",myGarden:"我的花園",
+      nickname:"暱稱（選填）",nicknamePlaceholder:"請勿輸入真實姓名",duration:"練習時間",minute:"分鐘",pace:"呼吸節奏",
+      paceGentle:"舒緩：吸4秒／呼6秒",paceEven:"平衡：吸4秒／呼4秒",paceEasy:"輕柔：吸3秒／呼5秒",dateTime:"日期與時間",
+      currentBreath:"目前呼吸",ready:"準備好時開始",readyHint:"以舒服、不勉強的方式自然呼吸",inhale:"吸氣",inhaleHint:"花朵慢慢展開，讓氣息自然進來",
+      exhale:"呼氣",exhaleHint:"花朵輕輕收合，慢慢吐氣",paused:"已暫停",pausedHint:"準備好後再繼續",
+      complete:"練習完成",completeHint:"留意此刻的呼吸與身體",gardenGrowth:"本次花園成長",seed:"種子",sprout:"發芽",bud:"花苞",bloom:"盛開",
+      todayPractices:"今日完成",gardenFlowers:"花園花朵",totalPractices:"累計完成",start:"開始練習",pause:"暫停",resume:"繼續",
+      restart:"重新開始",soundOff:"提示音：關",soundOn:"提示音：開",safety:"若感到頭暈或不舒服，請回到自然呼吸並停止練習。",
+      terms:"完整著作權與使用條款",guideTitle:"呼吸花開｜使用指南",guideSub:"簡單、溫柔、不需要追求完美。",
+      g1:"輸入選填暱稱，選擇 1、3 或 5 分鐘。",g2:"花朵展開時吸氣，花朵收合時呼氣；不需要憋氣。",
+      g3:"完成練習後，系統會自動保存日期、時間、練習時長與獲得的花朵。",g4:"每次完成都會得到一朵驚喜花，可在「我的花園」查看。",
+      g5:"按下「提示音：關」可開啟並立即試聽柔和提示音。",guideSafety:"本工具僅供正念練習與自我覺察使用，不作為個人能力評價。請以舒適自然的方式進行。",
+      gardenTitle:"我的呼吸花園",gardenSub:"每一次完成，都為花園增加一朵花。",weeklyGarden:"最近七天花園",gentleBadges:"溫柔成就",
+      recentFlowers:"最近獲得的花朵",onlineBackup:"允許線上進度備份（暱稱、完成日期時間、練習時長與花朵）",
+      onlinePrivacy:"線上備份為自願選項。請勿使用真實姓名；系統不收集情緒、放鬆程度、呼吸循環或文字反思。",
+      export:"匯出 CSV",clear:"清除紀錄",close:"關閉",rewardTitle:"今天的呼吸花已盛開",viewGarden:"查看我的花園",practiceAgain:"再練習一次",
+      termsTitle:"著作權與使用條款",termsP1:"本網站內容僅供文化教育、認知活動、正念練習與互動體驗使用。未經授權，不得作商業用途、重製、改作或散布。",
+      termsP2:"一般分享、教學引用或非商業使用，請清楚標示來源：Hylove Business Inc / AI-Mind Care。",
+      termsP3:"每筆完成紀錄只包含暱稱、完成日期與時間、練習時長及獲得的花朵。本機紀錄可由使用者自行匯出或清除；只有在使用者主動啟用線上進度備份時，指定欄位才會傳送至線上紀錄系統。",
+      noRecords:"花園還是空的，完成第一次練習就會開花。",times:"次",completedAt:"完成",confirmClear:"確定清除所有本機花園與練習紀錄嗎？",
+      csvNickname:"暱稱",csvCompleted:"完成日期時間",csvDuration:"練習分鐘",csvFlower:"花朵",csvOnline:"線上備份狀態",
+      badgeFirst:"初次綻放",badgeThree:"三朵相伴",badgeSeven:"七日花園",badgeTenMin:"靜心十分鐘",badgeTwenty:"百花小園丁",
+      quote1:"今天，您為自己保留了一段安靜的時間。",quote2:"一呼一吸，也是一種溫柔的照顧。",quote3:"不必完美，只要願意回到此刻。",
+      quote4:"讓心慢一點，花就有時間盛開。",quote5:"每一次停下來，都是重新出發的力量。",
+      onlineSent:"已備份",localOnly:"本機",onlineFailed:"待重試"
+    },
+    en:{
+      title:"AI-Mind Care Breathing Flower",subtitle:"With each breath, let today’s garden gently bloom",home:"Home",guide:"User Guide",myGarden:"My Garden",
+      nickname:"Nickname (optional)",nicknamePlaceholder:"Do not enter your real name",duration:"Practice Time",minute:"min",pace:"Breathing Pace",
+      paceGentle:"Calm: inhale 4s / exhale 6s",paceEven:"Balanced: inhale 4s / exhale 4s",paceEasy:"Gentle: inhale 3s / exhale 5s",dateTime:"Date and Time",
+      currentBreath:"Current Breath",ready:"Start when ready",readyHint:"Breathe naturally and comfortably",inhale:"Inhale",inhaleHint:"Let the flower open as the breath comes in",
+      exhale:"Exhale",exhaleHint:"Let the flower close as you breathe out slowly",paused:"Paused",pausedHint:"Continue when you feel ready",
+      complete:"Practice complete",completeHint:"Notice your breath and body in this moment",gardenGrowth:"This Session’s Growth",seed:"Seed",sprout:"Sprout",bud:"Bud",bloom:"Bloom",
+      todayPractices:"Today",gardenFlowers:"Garden Flowers",totalPractices:"Total Sessions",start:"Start",pause:"Pause",resume:"Resume",
+      restart:"Start Over",soundOff:"Sound: Off",soundOn:"Sound: On",safety:"If you feel dizzy or uncomfortable, return to natural breathing and stop.",
+      terms:"Full Copyright & Terms",guideTitle:"Breathing Flower | User Guide",guideSub:"Simple, gentle, and never about being perfect.",
+      g1:"Enter an optional nickname and choose 1, 3, or 5 minutes.",g2:"Inhale as the flower opens and exhale as it closes. No breath holding is needed.",
+      g3:"After completion, the date, time, duration, and flower reward are saved automatically.",g4:"Every completed session adds a surprise flower to My Garden.",
+      g5:"Select “Sound: Off” to turn sound on and immediately hear a gentle sample.",guideSafety:"This tool supports mindfulness practice and self-awareness and is not used to evaluate personal ability. Practise gently and comfortably.",
+      gardenTitle:"My Breathing Garden",gardenSub:"Every completed session adds one flower to your garden.",weeklyGarden:"Last Seven Days",gentleBadges:"Gentle Achievements",
+      recentFlowers:"Recent Flowers",onlineBackup:"Allow online progress backup (nickname, completion date/time, duration, and flower)",
+      onlinePrivacy:"Online backup is voluntary. Do not use a real name. Emotion, relaxation, breathing cycles, and written reflection are not collected.",
+      export:"Export CSV",clear:"Clear Records",close:"Close",rewardTitle:"Today’s breathing flower has bloomed",viewGarden:"View My Garden",practiceAgain:"Practise Again",
+      termsTitle:"Copyright & Terms of Use",termsP1:"This website is for cultural education, cognitive activities, mindfulness practice, and interactive experience. Commercial use, reproduction, adaptation, or distribution requires authorization.",
+      termsP2:"For general sharing, teaching quotation, or non-commercial use, clearly credit Hylove Business Inc / AI-Mind Care.",
+      termsP3:"Each completed record contains only a nickname, completion date and time, practice duration, and flower reward. Local records can be exported or cleared by the user. Specified fields are transmitted only when the user actively enables online progress backup.",
+      noRecords:"Your garden is still empty. Complete one session to grow the first flower.",times:"times",completedAt:"Completed",confirmClear:"Clear all local garden and practice records?",
+      csvNickname:"Nickname",csvCompleted:"Completion Date and Time",csvDuration:"Practice Minutes",csvFlower:"Flower",csvOnline:"Online Backup Status",
+      badgeFirst:"First Bloom",badgeThree:"Three Flowers",badgeSeven:"Seven-Day Garden",badgeTenMin:"Ten Mindful Minutes",badgeTwenty:"Garden Keeper",
+      quote1:"Today, you made a little quiet space for yourself.",quote2:"One breath at a time can also be an act of care.",quote3:"You do not need perfection—only a return to this moment.",
+      quote4:"Let the mind slow down so the flower has time to bloom.",quote5:"Every pause can become strength for a new beginning.",
+      onlineSent:"Backed up",localOnly:"Local",onlineFailed:"Retry needed"
+    }
+  };
+
+  const flowers = [
+    {id:"daisy",emoji:"🌼",zh:"小雛菊",en:"Daisy"},
+    {id:"lavender",emoji:"🪻",zh:"薰衣草",en:"Lavender"},
+    {id:"tulip",emoji:"🌷",zh:"鬱金香",en:"Tulip"},
+    {id:"sunflower",emoji:"🌻",zh:"向日葵",en:"Sunflower"},
+    {id:"cherry",emoji:"🌸",zh:"櫻花",en:"Cherry Blossom"},
+    {id:"rose",emoji:"🌹",zh:"玫瑰",en:"Rose"},
+    {id:"lotus",emoji:"🪷",zh:"蓮花",en:"Lotus"},
+    {id:"hibiscus",emoji:"🌺",zh:"扶桑花",en:"Hibiscus"}
+  ];
+
+  let lang = localStorage.getItem("amc_breath_lang") || "zh";
+  let running=false,paused=false,completed=false,soundOn=localStorage.getItem(SOUND_KEY)==="1";
+  let duration=60,remaining=60,elapsed=0,inhaleSeconds=4,exhaleSeconds=6,phase="ready",phaseRemaining=0;
+  let tickHandle=null,lastTick=0,sessionStart=null,audioCtx=null;
+
+  const flower=$("#flower"),halo=$("#halo"),phaseText=$("#phaseText"),instruction=$("#instruction");
+  const timer=$("#timer"),progressBar=$("#progressBar"),startBtn=$("#startBtn"),pauseBtn=$("#pauseBtn");
+
+  function t(key){return translations[lang][key]||key}
+  function esc(value){return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+  function dateKey(date){return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`}
+  function formatDateTime(date){
+    return date.toLocaleString(lang==="zh"?"zh-TW":"en-US",{year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false});
+  }
+  function formatTime(sec){
+    sec=Math.max(0,Math.ceil(sec));return `${String(Math.floor(sec/60)).padStart(2,"0")}:${String(sec%60).padStart(2,"0")}`;
+  }
+  function applyLanguage(){
+    document.documentElement.lang=lang==="zh"?"zh-Hant":"en";
+    $$("[data-i18n]").forEach(el=>{const key=el.dataset.i18n;if(translations[lang][key]!==undefined)el.textContent=translations[lang][key]});
+    $$("[data-i18n-placeholder]").forEach(el=>el.placeholder=t(el.dataset.i18nPlaceholder));
+    $("#langBtn").textContent=lang==="zh"?"EN":"中文";
+    localStorage.setItem("amc_breath_lang",lang);
+    updateClock();updateSoundButton();updatePhaseText();renderGarden();
+  }
+  function updateClock(){$("#currentDateTime").textContent=formatDateTime(new Date())}
+  function readSettings(){
+    duration=Number($('input[name="duration"]:checked').value);
+    remaining=duration;elapsed=0;[inhaleSeconds,exhaleSeconds]=$("#pace").value.split(",").map(Number);
+    updateProgress();
+  }
+  function lockSettings(lock){$$('input[name="duration"],#pace,#nickname').forEach(el=>el.disabled=lock)}
+  function updateProgress(){
+    timer.textContent=formatTime(remaining);
+    const ratio=duration?Math.min(1,elapsed/duration):0;
+    progressBar.style.width=`${ratio*100}%`;
+    const stage=Math.min(3,Math.floor(ratio*4));
+    $$(".growth-step").forEach((el,i)=>el.classList.toggle("active",i<=stage));
+  }
+  function updatePhaseText(){
+    if(completed){phaseText.textContent=t("complete");instruction.textContent=t("completeHint");return}
+    if(paused){phaseText.textContent=t("paused");instruction.textContent=t("pausedHint");return}
+    if(!running){phaseText.textContent=t("ready");instruction.textContent=t("readyHint");return}
+    phaseText.textContent=t(phase);instruction.textContent=t(phase+"Hint");
+  }
+  function setPhase(next){
+    phase=next;flower.classList.remove("inhale","exhale");halo.classList.remove("inhale","exhale");
+    if(next==="inhale"){
+      phaseRemaining=inhaleSeconds;flower.classList.add("inhale");halo.classList.add("inhale");
+      flower.style.transitionDuration=`${inhaleSeconds}s`;halo.style.transitionDuration=`${inhaleSeconds}s`;playTone(520,.3);
+    }else{
+      phaseRemaining=exhaleSeconds;flower.classList.add("exhale");halo.classList.add("exhale");
+      flower.style.transitionDuration=`${exhaleSeconds}s`;halo.style.transitionDuration=`${exhaleSeconds}s`;playTone(385,.34);
+    }
+    updatePhaseText();
+  }
+  async function ensureAudio(){
+    try{
+      if(!audioCtx){const AC=window.AudioContext||window.webkitAudioContext;audioCtx=new AC()}
+      if(audioCtx.state==="suspended")await audioCtx.resume();
+      return true;
+    }catch(e){return false}
+  }
+  async function playTone(freq=520,length=.3,force=false){
+    if(!soundOn&&!force)return;
+    const okay=await ensureAudio();if(!okay)return;
+    const now=audioCtx.currentTime,osc=audioCtx.createOscillator(),gain=audioCtx.createGain();
+    osc.type="sine";osc.frequency.setValueAtTime(freq,now);
+    gain.gain.setValueAtTime(.0001,now);
+    gain.gain.exponentialRampToValueAtTime(.075,now+.025);
+    gain.gain.exponentialRampToValueAtTime(.0001,now+length);
+    osc.connect(gain);gain.connect(audioCtx.destination);osc.start(now);osc.stop(now+length+.03);
+  }
+  function updateSoundButton(){
+    $("#soundBtn").innerHTML=`${soundOn?"🔊":"🔇"} <span>${soundOn?t("soundOn"):t("soundOff")}</span>`;
+    $("#soundBtn").setAttribute("aria-pressed",String(soundOn));
+  }
+  async function toggleSound(){
+    soundOn=!soundOn;localStorage.setItem(SOUND_KEY,soundOn?"1":"0");updateSoundButton();
+    if(soundOn)await playTone(590,.45,true);
+  }
+  function start(){
+    if(completed)resetSession();
+    readSettings();running=true;paused=false;completed=false;sessionStart=new Date();
+    lockSettings(true);startBtn.disabled=true;pauseBtn.disabled=false;pauseBtn.innerHTML=`⏸ <span>${t("pause")}</span>`;
+    setPhase("inhale");lastTick=performance.now();tickHandle=requestAnimationFrame(tick);
+  }
+  function tick(now){
+    if(!running||paused)return;
+    const dt=Math.min(.25,(now-lastTick)/1000||0);lastTick=now;
+    elapsed+=dt;remaining=Math.max(0,duration-elapsed);phaseRemaining-=dt;
+    if(phaseRemaining<=0)setPhase(phase==="inhale"?"exhale":"inhale");
+    updateProgress();
+    if(remaining<=0){completeSession();return}
+    tickHandle=requestAnimationFrame(tick);
+  }
+  function pause(){
+    if(!running)return;paused=true;cancelAnimationFrame(tickHandle);flower.classList.add("paused");halo.classList.add("paused");
+    pauseBtn.innerHTML=`▶ <span>${t("resume")}</span>`;updatePhaseText();
+  }
+  function resume(){
+    paused=false;flower.classList.remove("paused");halo.classList.remove("paused");
+    pauseBtn.innerHTML=`⏸ <span>${t("pause")}</span>`;lastTick=performance.now();updatePhaseText();tickHandle=requestAnimationFrame(tick);
+  }
+  function resetSession(){
+    cancelAnimationFrame(tickHandle);running=false;paused=false;completed=false;sessionStart=null;
+    readSettings();flower.className="flower exhale";halo.className="halo exhale";
+    flower.style.transitionDuration="1s";halo.style.transitionDuration="1s";
+    startBtn.disabled=false;pauseBtn.disabled=true;pauseBtn.innerHTML=`⏸ <span>${t("pause")}</span>`;
+    lockSettings(false);updatePhaseText();
+  }
+  async function completeSession(){
+    running=false;paused=false;completed=true;remaining=0;elapsed=duration;cancelAnimationFrame(tickHandle);
+    lockSettings(false);startBtn.disabled=false;pauseBtn.disabled=true;updateProgress();updatePhaseText();
+    const reward=await saveCompletion();
+    await playTone(670,.35);setTimeout(()=>playTone(830,.42),220);
+    if(navigator.vibrate)navigator.vibrate([60,45,80]);
+    showReward(reward);
+  }
+
+  function migrateOldRecords(){
+    if(localStorage.getItem(STORAGE_KEY))return;
+    let old=[];try{old=JSON.parse(localStorage.getItem(OLD_STORAGE_KEY)||"[]")}catch(e){}
+    if(!Array.isArray(old)||!old.length){localStorage.setItem(STORAGE_KEY,"[]");return}
+    const migrated=old.map((r,i)=>{
+      const f=flowers[i%flowers.length];
+      return {
+        id:r.id||Date.now()+i,nickname:r.nickname||"",completedAt:r.endIso||r.iso||new Date().toISOString(),
+        durationMin:Number(r.durationMin)||1,flowerId:f.id,emoji:f.emoji,flowerZh:f.zh,flowerEn:f.en,onlineStatus:"local"
+      }
+    });
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(migrated));
+  }
+  function getRecords(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]")}catch(e){return[]}}
+  function setRecords(records){localStorage.setItem(STORAGE_KEY,JSON.stringify(records))}
+  function chooseFlower(){
+    const records=getRecords(),recent=records.slice(0,2).map(r=>r.flowerId);
+    const pool=flowers.filter(f=>!recent.includes(f.id));
+    return (pool.length?pool:flowers)[Math.floor(Math.random()*(pool.length?pool.length:flowers.length))];
+  }
+  async function saveCompletion(){
+    const now=new Date(),f=chooseFlower(),nickname=$("#nickname").value.trim();
+    localStorage.setItem(NICKNAME_KEY,nickname);
+    const record={
+      id:Date.now(),nickname,completedAt:now.toISOString(),durationMin:Math.round(duration/60),
+      flowerId:f.id,emoji:f.emoji,flowerZh:f.zh,flowerEn:f.en,onlineStatus:"local"
+    };
+    const records=getRecords();records.unshift(record);setRecords(records);
+    if(ONLINE_ENDPOINT&&$("#onlineBackup").checked){
+      const result=await sendOnline(record);record.onlineStatus=result;
+      const updated=getRecords(),idx=updated.findIndex(r=>r.id===record.id);if(idx>=0){updated[idx]=record;setRecords(updated)}
+    }
+    renderGarden();return record;
+  }
+  async function sendOnline(record){
+    const payload=new URLSearchParams({
+      recordId:String(record.id),nickname:record.nickname,completedAt:record.completedAt,
+      durationMinutes:String(record.durationMin),flower:record.flowerZh,source:"AI-Mind Care Breathing Flower V1.2.1"
+    });
+    try{
+      await fetch(ONLINE_ENDPOINT,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8"},body:payload.toString()});
+      return "sent";
+    }catch(e){console.error(e);return "failed"}
+  }
+  function todayRecords(records=getRecords()){const key=dateKey(new Date());return records.filter(r=>dateKey(new Date(r.completedAt))===key)}
+  function renderGarden(){
+    const records=getRecords(),today=todayRecords(records);
+    $("#todayCount").textContent=today.length;$("#gardenCount").textContent=records.length;
+    $("#modalToday").textContent=today.length;$("#modalTotal").textContent=records.length;$("#modalFlowers").textContent=records.length;
+    renderWeek(records);renderBadges(records);renderRecordList(records);
+    const box=$("#onlineBox");
+    if(ONLINE_ENDPOINT){box.classList.add("visible");$("#onlineBackup").checked=localStorage.getItem(BACKUP_KEY)==="1"}
+    else box.classList.remove("visible");
+  }
+  function renderWeek(records){
+    const days=[];const today=new Date();
+    for(let i=6;i>=0;i--){const d=new Date(today);d.setHours(0,0,0,0);d.setDate(d.getDate()-i);days.push(d)}
+    $("#weekGarden").innerHTML=days.map(d=>{
+      const matches=records.filter(r=>dateKey(new Date(r.completedAt))===dateKey(d));
+      const latest=matches[0],dayLabel=d.toLocaleDateString(lang==="zh"?"zh-TW":"en-US",{weekday:"short"});
+      return `<div class="day-pot"><div class="day">${esc(dayLabel)}</div><div class="bloom">${latest?esc(latest.emoji):"🪴"}</div><div class="count">${matches.length?matches.length+" "+t("times"):"—"}</div></div>`
+    }).join("");
+  }
+  function renderBadges(records){
+    const uniqueDays=new Set(records.map(r=>dateKey(new Date(r.completedAt)))).size,totalMin=records.reduce((s,r)=>s+Number(r.durationMin||0),0);
+    const defs=[
+      {icon:"🌱",key:"badgeFirst",earned:records.length>=1},{icon:"🌼",key:"badgeThree",earned:records.length>=3},
+      {icon:"🌈",key:"badgeSeven",earned:uniqueDays>=7},{icon:"🕯️",key:"badgeTenMin",earned:totalMin>=10},
+      {icon:"🧑‍🌾",key:"badgeTwenty",earned:records.length>=20}
+    ];
+    $("#badges").innerHTML=defs.map(b=>`<span class="badge ${b.earned?"earned":""}">${b.icon} ${esc(t(b.key))}</span>`).join("");
+  }
+  function renderRecordList(records){
+    const list=$("#recordList");
+    if(!records.length){list.innerHTML=`<div class="empty">${esc(t("noRecords"))}</div>`;return}
+    list.innerHTML=records.slice(0,40).map(r=>{
+      const dt=new Date(r.completedAt),flowerName=lang==="zh"?r.flowerZh:r.flowerEn;
+      const status=r.onlineStatus==="sent"?t("onlineSent"):(r.onlineStatus==="failed"?t("onlineFailed"):t("localOnly"));
+      return `<article class="record-card"><div class="record-flower">${esc(r.emoji||"🌸")}</div><div>
+        <strong>${esc(flowerName||"Breathing Flower")}</strong>
+        <small>${esc(formatDateTime(dt))} ・ ${Number(r.durationMin)||1} ${esc(t("minute"))}<br>${esc(r.nickname||"—")} ・ ${esc(status)}</small>
+      </div></article>`
+    }).join("");
+  }
+  function randomQuote(){
+    const keys=["quote1","quote2","quote3","quote4","quote5"];return t(keys[Math.floor(Math.random()*keys.length)])
+  }
+  function showReward(record){
+    $("#rewardEmoji").textContent=record.emoji;
+    $("#rewardName").textContent=lang==="zh"?record.flowerZh:record.flowerEn;
+    $("#rewardQuote").textContent=randomQuote();
+    $("#rewardMeta").textContent=`${formatDateTime(new Date(record.completedAt))} ・ ${record.durationMin} ${t("minute")} ・ ${t("totalPractices")}: ${getRecords().length}`;
+    burstPetals();
+    $("#rewardDialog").showModal();
+  }
+  function burstPetals(){
+    const burst=$("#petalBurst");burst.innerHTML="";
+    const symbols=["🌸","✨","🌼","·"];
+    for(let i=0;i<18;i++){
+      const s=document.createElement("span");s.textContent=symbols[i%symbols.length];
+      s.style.left=`${Math.random()*100}%`;s.style.animationDelay=`${Math.random()*.7}s`;
+      s.style.setProperty("--drift",`${(Math.random()-.5)*180}px`);burst.appendChild(s)
+    }
+  }
+  function csvCell(v){return `"${String(v??"").replace(/"/g,'""')}"`}
+  function exportCsv(){
+    const rows=getRecords().map(r=>[
+      r.nickname,formatDateTime(new Date(r.completedAt)),r.durationMin,
+      lang==="zh"?r.flowerZh:r.flowerEn,r.onlineStatus||"local"
+    ]);
+    const headers=[t("csvNickname"),t("csvCompleted"),t("csvDuration"),t("csvFlower"),t("csvOnline")];
+    const csv="\uFEFF"+[headers,...rows].map(row=>row.map(csvCell).join(",")).join("\r\n");
+    const blob=new Blob([csv],{type:"text/csv;charset=utf-8"}),a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);a.download=`AI-Mind-Care-Breathing-Garden-${dateKey(new Date())}.csv`;
+    document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),800)
+  }
+
+  $("#startBtn").addEventListener("click",start);
+  $("#pauseBtn").addEventListener("click",()=>paused?resume():pause());
+  $("#resetBtn").addEventListener("click",resetSession);
+  $("#soundBtn").addEventListener("click",toggleSound);
+  $("#langBtn").addEventListener("click",()=>{lang=lang==="zh"?"en":"zh";applyLanguage()});
+  $("#guideBtn").addEventListener("click",()=>$("#guideDialog").showModal());
+  $("#gardenBtn").addEventListener("click",()=>{renderGarden();$("#gardenDialog").showModal()});
+  $("#termsBtn").addEventListener("click",()=>$("#termsDialog").showModal());
+  $("#viewGardenBtn").addEventListener("click",()=>{$("#rewardDialog").close();renderGarden();$("#gardenDialog").showModal()});
+  $("#practiceAgainBtn").addEventListener("click",()=>{$("#rewardDialog").close();resetSession();start()});
+  $("#exportBtn").addEventListener("click",exportCsv);
+  $("#clearBtn").addEventListener("click",()=>{if(confirm(t("confirmClear"))){setRecords([]);renderGarden()}});
+  $("#onlineBackup").addEventListener("change",e=>localStorage.setItem(BACKUP_KEY,e.target.checked?"1":"0"));
+  $("#nickname").addEventListener("input",()=>localStorage.setItem(NICKNAME_KEY,$("#nickname").value.trim()));
+  $$('input[name="duration"]').forEach(el=>el.addEventListener("change",()=>{if(!running)readSettings()}));
+  $("#pace").addEventListener("change",()=>{[inhaleSeconds,exhaleSeconds]=$("#pace").value.split(",").map(Number)});
+  $$(".closeDialog").forEach(b=>b.addEventListener("click",()=>b.closest("dialog").close()));
+  $$("dialog").forEach(d=>d.addEventListener("click",e=>{if(e.target===d)d.close()}));
+  document.addEventListener("visibilitychange",()=>{if(document.hidden&&running&&!paused)pause()});
+
+  migrateOldRecords();
+  $("#nickname").value=localStorage.getItem(NICKNAME_KEY)||"";
+  setInterval(updateClock,1000);
+  applyLanguage();readSettings();renderGarden();
+})();
+</script>
+</body>
+</html>
